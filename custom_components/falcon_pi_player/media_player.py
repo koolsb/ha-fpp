@@ -56,7 +56,7 @@ class FalconPiPlayer(MediaPlayerEntity):
         self._media_title = ""
         self._media_playlist = ""
         self._playlists = []
-        self._repeat = False
+        self._repeat = REPEAT_MODE_OFF
 
     def update(self):
         """Get the latest state from the player."""
@@ -69,6 +69,10 @@ class FalconPiPlayer(MediaPlayerEntity):
         self._volume = status["volume"] / 100
         self._media_title = status["current_sequence"].replace(".fseq", "")
         self._media_playlist = status["current_playlist"]["playlist"]
+        if status["repeat_mode"] == 1:
+            self._repeat = REPEAT_MODE_ALL
+        else:
+            self._repeat = REPEAT_MODE_OFF
 
         playlists = requests.get(
             "http://%s/api/playlists/playable" % (self._host)
@@ -118,10 +122,7 @@ class FalconPiPlayer(MediaPlayerEntity):
     @property
     def repeat(self):
         """"Return current repeat mode."""
-        if self._repeat:
-            return REPEAT_MODE_ALL
-        else:
-            return REPEAT_MODE_OFF
+        return self._repeat
 
     def select_source(self, source):
         """Choose a playlist to play."""
