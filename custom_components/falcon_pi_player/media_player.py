@@ -10,9 +10,6 @@ from homeassistant.components.media_player.const import (
     SUPPORT_VOLUME_STEP,
     SUPPORT_SELECT_SOURCE,
     SUPPORT_STOP,
-    SUPPORT_REPEAT_SET,
-    REPEAT_MODE_OFF,
-    REPEAT_MODE_ALL
 )
 from homeassistant.const import (
     CONF_HOST,
@@ -27,7 +24,7 @@ _LOGGER = logging.getLogger(__name__)
 DEFAULT_NAME = "Falcon Pi Player"
 
 SUPPORT_FPP = (
-    SUPPORT_VOLUME_SET | SUPPORT_VOLUME_STEP | SUPPORT_SELECT_SOURCE | SUPPORT_STOP | SUPPORT_REPEAT_SET
+    SUPPORT_VOLUME_SET | SUPPORT_VOLUME_STEP | SUPPORT_SELECT_SOURCE | SUPPORT_STOP
 )
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
@@ -56,7 +53,6 @@ class FalconPiPlayer(MediaPlayerEntity):
         self._media_title = ""
         self._media_playlist = ""
         self._playlists = []
-        self._repeat = REPEAT_MODE_OFF
 
     def update(self):
         """Get the latest state from the player."""
@@ -69,10 +65,6 @@ class FalconPiPlayer(MediaPlayerEntity):
         self._volume = status["volume"] / 100
         self._media_title = status["current_sequence"].replace(".fseq", "")
         self._media_playlist = status["current_playlist"]["playlist"]
-        if status["repeat_mode"] == 1:
-            self._repeat = REPEAT_MODE_ALL
-        else:
-            self._repeat = REPEAT_MODE_OFF
 
         playlists = requests.get(
             "http://%s/api/playlists/playable" % (self._host)
@@ -119,11 +111,6 @@ class FalconPiPlayer(MediaPlayerEntity):
         """Return the current playlist."""
         return self._media_playlist
 
-    @property
-    def repeat(self):
-        """"Return current repeat mode."""
-        return self._repeat
-
     def select_source(self, source):
         """Choose a playlist to play."""
         requests.get("http://%s/api/playlist/%s/start" % (self._host, source))
@@ -154,12 +141,3 @@ class FalconPiPlayer(MediaPlayerEntity):
     def media_stop(self):
         """Immediately stop all FPP Sequences playing"""
         requests.get("http://%s/api/playlists/stop" % (self._host))
-
-    def set_repeat(self, repeat):
-        """Set repeat mode."""
-        if repeat == "off":
-            requests.post("http://%s/api/command" % (self._host), json={"command":"MQTT","args": ["fpp/falcon/player/FPP/playlist/repeat/set",0]})
-            self._repeat = REPEAT_MODE_OFF
-        else:
-            requests.post("http://%s/api/command" % (self._host), json={"command":"MQTT","args": ["fpp/falcon/player/FPP/playlist/repeat/set",1]})
-            self._repeat = REPEAT_MODE_ALL
