@@ -27,7 +27,7 @@ Install it as any custom homeassistant component:
 
 After a correct installation, your configuration directory should look like the following:
 
-    ```
+    
     └── ...
     └── configuration.yaml
     └── custom_components
@@ -35,7 +35,7 @@ After a correct installation, your configuration directory should look like the 
             └── __init__.py
             └── media_player.py
             └── manifest.json
-    ```
+    
 
 # Configuration
 
