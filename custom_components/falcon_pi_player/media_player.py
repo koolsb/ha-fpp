@@ -69,7 +69,7 @@ class FalconPiPlayer(MediaPlayerEntity):
         self._volume = status["volume"] / 100
         self._media_title = status["current_sequence"].replace(".fseq", "")
         self._media_playlist = status["current_playlist"]["playlist"]
-        self._media_duration = int(status["seconds_played"]) + int(status["seconds_remaining"])
+        self._media_duration = str(int(status["seconds_played"]) + int(status["seconds_remaining"]))
         self._media_position = status["seconds_played"]
         self._media_position_updated_at = datetime.datetime.now()
 
