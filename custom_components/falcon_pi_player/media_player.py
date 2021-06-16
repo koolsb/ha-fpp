@@ -1,6 +1,7 @@
 """Support for the Falcon Pi Player."""
 import logging
 import requests
+import datetime
 import voluptuous as vol
 
 from homeassistant.components.media_player import PLATFORM_SCHEMA, MediaPlayerEntity
@@ -53,6 +54,9 @@ class FalconPiPlayer(MediaPlayerEntity):
         self._media_title = ""
         self._media_playlist = ""
         self._playlists = []
+        self._media_duration = 0
+        self._media_position = 0
+        self._media_position_updated_at = datetime.datetime.now()
 
     def update(self):
         """Get the latest state from the player."""
@@ -65,6 +69,9 @@ class FalconPiPlayer(MediaPlayerEntity):
         self._volume = status["volume"] / 100
         self._media_title = status["current_sequence"].replace(".fseq", "")
         self._media_playlist = status["current_playlist"]["playlist"]
+        self._media_duration = status["seconds_played"] + status["seconds_remaining"]
+        self._media_position = status["seconds_played"]
+        self._media_position_updated_at = datetime.datetime.now()
 
         playlists = requests.get(
             "http://%s/api/playlists/playable" % (self._host)
@@ -110,6 +117,21 @@ class FalconPiPlayer(MediaPlayerEntity):
     def source(self):
         """Return the current playlist."""
         return self._media_playlist
+
+    @property
+    def media_position(self):
+        """Return the position of the current media."""
+        return self._media_position
+    
+    @property
+    def media_position_updated_at(self):
+        """Return the time the position of the current media was updated."""
+        return self._media_position_updated_at
+    
+    @property
+    def media_duration(self):
+        """Return the duration of the current media."""
+        return self._media_duration
 
     def select_source(self, source):
         """Choose a playlist to play."""
