@@ -1,7 +1,5 @@
 {
     "name": "Falcon Pi Player (FPP)",
     "render_readme": true,
-    "domains": [
-        "media-player"
-    ]
+    "domains": "media-player"
 }
