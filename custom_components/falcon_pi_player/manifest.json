@@ -4,8 +4,9 @@
     "documentation": "https://github.com/koolsb/ha-fpp",
     "codeowners": ["@koolsb"],
     "iot_class": "local_polling",
+    "dependencies": ["http", "media_source"]
     "requirements": ["requests==2.28.1"],
     "config_flow": false,
     "issue_tracker": "https://github.com/koolsb/ha-fpp/issues",
-    "version": "0.1.4"
+    "version": "0.1.5"
   }
